@@ -128,7 +128,7 @@ export default function MovieComp(props) {
                             <Typography sx={{textAlign:"right", color:"secondary.200"}}>
                                 Uploaded:
                                 <em>{dateFixer(views.date)}</em>
-                            </Typography>
+                            </Typography> 
     
                         </Paper>) : <Box>
                                 No reviews for this movie :/
