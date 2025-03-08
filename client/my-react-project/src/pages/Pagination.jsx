@@ -10,7 +10,7 @@ export default function Pagination(props) {
             arr.length = props.numOfPages;
         }
         
-       console.log(arr.length);
+       //console.log(arr.length);
        arr.fill("");
 }
 
@@ -24,15 +24,15 @@ export default function Pagination(props) {
         if (props.numOfPages > 11) {
             if (page < 3) {
                 subarr = arr.slice(0, 10);
-                console.log(`arr sliced = [${arr.slice(0,10).length}]`)
+                //console.log(`arr sliced = [${arr.slice(0,10).length}]`)
             } else {
                 subarr = arr.slice(page-1, page+5);
                 
             }
         }
         //subarr.fill("");
-        console.log(`subarr:${subarr.length} , arr:${arr.length}`);
-        console.log(`props.numOfPages:${props.numOfPages}`);
+        //console.log(`subarr:${subarr.length} , arr:${arr.length}`);
+        //console.log(`props.numOfPages:${props.numOfPages}`);
     }
 
     
@@ -55,6 +55,7 @@ export default function Pagination(props) {
     },[]);
     
     useEffect(()=>{
+        fillArr();
         //fillSubArr(parseInt(props.page));
     },[props.page])
 

@@ -1,61 +1,86 @@
 import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-import img1 from "../images/placeholder-image-1.jpg"
-import img2 from "../images/placeholder-image-2.jpg"
-import img3 from "../images/placeholder-image-3.jpg"
-import img4 from "../images/placeholder-image-4.jpg"
-let images = [img1, img2, img3, img4];
 import Pagination from "./Pagination.jsx";
+import { Box, Button, CardMedia, Container, List, Paper, Skeleton, Typography } from "@mui/material";
 
 export default function SearchResults(props) {
   let navi = useNavigate();
-    
-    useEffect(()=>{  //re-render the component on every search change
-      //props.handleSearch(); //calling this would be stupid since that would lead to the componenet endlessly re-rendering
-      navi(`/search?${props.queryType}=${props.query}&page=${props.page}`);
-
-
-      //props.setLoading(false);
-    },[props.search]);
-    
     useEffect(()=>{ //re-render the component on every page change
       props.handleSearch(); 
-      navi(`/search?${props.queryType}=${props.query}&page=${props.page}`);
-
-
-      //props.setLoading(false); //something about this re-calls the handleSearch function with the first page results
+      //navi(`/search?${props.queryType}=${props.query}&page=${props.page}`);
+      //props.setLoading(false);
     },[props.page]);
 
     
     if (props.loading) {
       return (
-        <div className="modal-box">
-          <div className="loader"></div>
-        </div>
+        <>
+        <Container maxWidth="xl" disableGutters>
+          <Box sx={{
+          display:"flex", flexWrap:"wrap",
+          justifyContent:"space-between", alignContent:"start",
+          height:"80vh"
+        }}>
+            {[...new Array(4)].map((val, index) => 
+            <Box key={index} sx={{width:"23%"}}>
+              <Skeleton width={"100%"} height={"500px"} />
+              <Skeleton width={"100%"} height={"10%"} />
+            </Box>
+            )}
+          </Box>
+        </Container>
+        </>
       )
     }
     
 
     return (
       <>
-        <div style={{display:"flex",justifyContent:"space-evenly", padding:"10px", flexWrap:"nowrap"}}>
-          {props.search.map((valObj,index) => <div className="search movies" style={{width:"23%"}} key={index}>
-            <img src={valObj.poster? valObj.poster : img1} alt="Movie Poster" title="movie poster" style={{height:"230px"}} />
-            <h3>{valObj.title}</h3>
-            <p>{valObj.plot}</p>
-            <span className="rated" style={{color:"cyan"}} >Rated:<br />{valObj.rated ? valObj.rated : "Unknown"}</span>
-            <ul>{valObj.genres.map((vals, ind) => <li key={ind}>{vals}</li> )}</ul>
-            <Link to={`/movies/id/${valObj._id}`}>View Reviews</Link>
-          </div> )}
-        </div>
+        <Container maxWidth="xl" disableGutters>
+          <Box sx={{
+          display:"flex", flexWrap:"nowrap",
+          justifyContent:"space-evenly", 
+          alignItems:"center", alignContent:"center", 
+          padding:"10px",
+          height:"100vh"
+          }}>
+              {props.search.map((valObj,index) => 
+              <Box key={index} sx={{width:"23%"}}>
+                <Paper sx={{
+                  display:"flex", flexDirection:"column",
+                  flexWrap:"nowrap",
+                  justifyContent:"space-between", alignContent:"space-evenly", 
+                  p:3, 
+                  minHeight:"650px"}}>
+                
+                <CardMedia image={valObj.poster ? valObj.poster : "https://placehold.co/800x600/000000/ffffff?text=Placeholder"} alt="Movie Poster" 
+                title="movie poster" sx={{height:"230px", width:"100%"}} />
 
-          <div className="footer-pagination" style={{display:"flex", justifyContent:"center"}}>
+                <Typography variant="h5">{valObj.title}</Typography>
+                <Typography variant="subtitle2">{valObj.plot}</Typography>
+                <Box sx={{color:"cyan"}}>
+                  Rated:<br />{valObj.rated ? valObj.rated : "Unknown"}
+                </Box>
+                <List>{valObj.genres.map((vals, ind) => <li key={ind}>{vals}</li> )}</List>
+                <Link to={`/movies/id/${valObj._id}`}>
+                  <Button variant="contained">
+                    View Reviews
+                  </Button>
+                </Link>
+                </Paper>
+              </Box> 
+            )}
 
-            <Pagination page={props.page} handlePagination={props.handlePagination} 
-            numOfPages={props.numOfPages}
-            />
+            </Box>
 
-          </div>
+            <Box sx={{display:"flex", justifyContent:"center"}}>
+
+              <Pagination page={props.page} handlePagination={props.handlePagination} 
+              numOfPages={props.numOfPages}
+              />
+
+            </Box>
+          </Container>
       </>
     )
 } 

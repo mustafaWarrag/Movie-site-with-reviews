@@ -12,6 +12,7 @@ dao
 controllers
 routers
 .env
+_tests_
 
 dist
 dist-ssr

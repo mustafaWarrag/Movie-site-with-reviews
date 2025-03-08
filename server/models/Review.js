@@ -5,8 +5,8 @@ import db from "../config/db.js";
 
 const Review = db.model("Review", {
     //_id:{type:ObjectId, default:ObjectId.createFromHexstring()} //handled by Mongodb 
-    name:{type:String, required:true},
-    user_id:{type:String, default:cuid2.createId()},
+    username:{type:String, required:true},
+    user_id:{type:String, required:true},
     date:{type:Date, default:new Date()},
     review:{type:String, required:true},
     movie_id:{type:ObjectId, required:true},

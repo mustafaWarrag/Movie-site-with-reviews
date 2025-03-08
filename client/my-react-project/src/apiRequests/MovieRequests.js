@@ -43,7 +43,7 @@ export default class MovieRequests {
                     reviews {
                         _id
                         user_id
-                        name
+                        username
                         review
                         date
                         movie_id
@@ -58,7 +58,31 @@ export default class MovieRequests {
             data:{query:GET_MOVIE_BY_ID}
         })
     }
-    static async searchForMovie(query, by="title", page=0) {
+    static async searchForMovie(data, page=0, num=4) {
+        let rated = data.rated === null? null : `\"${data.rated}\"`;
+        let title = `\"${data.title}\"`;
+        const SEARCH_FOR_MOVIE = `#graphql
+            query SearchForMovieByFilter {
+                searchForMovieByFilter(page: ${page}, num: ${num}, rated: ${rated}, title: ${title}) {
+                    movies {
+                        _id
+                        title
+                        plot
+                        genres
+                        cast
+                        poster
+                        runtime
+                        rated
+                    }
+                    totalNumOfMovies
+                }
+            }
+        `;
+        return await axios({
+            url:`http://localhost:8080/graphql/`,
+            method:"post",
+            data:{query:SEARCH_FOR_MOVIE}
+        })
         //return await axios.get(`http://localhost:8080/api/v1/movies?${by}=${query}&page=${page}&moviesPerPage=4`);
         
     }
@@ -74,31 +98,5 @@ export default class MovieRequests {
             method:"post",
             data:{query:GET_RATINGS}})
         
-    }
-    static async addReview(data) {
-        try {
-            return await axios.post(`http://localhost:8080/api/v1/movies/reviews`, data);
-        } catch(err) {
-            console.error("Unable to post review" + err);
-            return
-        }
-    }
-    static async updateReview(data) {
-        try {
-            return await axios.put(`http://localhost:8080/api/v1/movies/reviews`, data);
-        } catch(err) {
-            console.error("Unable to update review" + err);
-            return
-        }
-    }
-    static async deleteReview(id, userId) {
-        try {
-            return await axios.delete(`http://localhost:8080/api/v1/movies/reviews`,
-                {data:{userId:userId, reviewId:id}}
-            );
-        } catch(err) {
-            console.error("Unable to delete review" + err);
-            return
-        }
     }
 }

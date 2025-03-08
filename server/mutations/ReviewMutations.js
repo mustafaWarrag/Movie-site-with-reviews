@@ -1,15 +1,27 @@
 import cuid2 from "@paralleldrive/cuid2";
 import { ObjectId } from "mongodb";
+import {GraphQLError} from "graphql";
 
 import Review from "../models/Review.js";
+import User from "../models/User.js";
+
 const ReviewMutations = {
     async createReview(parent, {input}) {
         try {
-            const {name, review, movie_id, stars} = input;
+            const {username, review, movie_id, stars} = input;
+            let userExists = await User.findOne({username:username});
+            if (!userExists) {
+                throw new GraphQLError("User does not exist");
+            }
+            let user_id = await userExists.get("_id");
+            let reviewExists = await Review.findOne({user_id:user_id, movie_id:movie_id});
+            if (reviewExists) {
+                throw new GraphQLError("You already posted a review on this movie");
+            }
             let objMovieId = movie_id instanceof ObjectId? movie_id : ObjectId.createFromHexString(movie_id); //does not work for some reason
             let reviewField = {
-                user_id:cuid2.createId(),
-                name:name,
+                user_id:user_id,
+                username:username,
                 review:review,
                 movie_id:objMovieId,
                 date:Date.now(),
@@ -18,15 +30,14 @@ const ReviewMutations = {
             
             let doc = new Review(reviewField);
             if (!doc) {
-                throw new Error("invalid input")
+                throw new GraphQLError("invalid input")
             }
             await doc.save();
             return doc;
             //return {status:200, message:"successfully created a review!"}
         } catch(err) {
             console.error("cant create review: " + err);
-            let data = {status:500, message:"failed to create review"}
-            return data;
+            return {error:err};
         }
     },
     
@@ -35,29 +46,39 @@ const ReviewMutations = {
             let review = args.review;
             let reviewId = args.id;
             //if (await Review.find({_id:}))
-            if (!(args.id) || !(args.review)) {
-                throw new Error("Provide values for the field");
+            if (!reviewId || !review) {
+                throw new GraphQLError("Provide values for the field");
+            }
+            let reviewExists = await Review.findOne({_id:ObjectId.createFromHexString(reviewId)});
+            if (!reviewExists) {
+                throw new GraphQLError("Review may not exist");
             }
             let updateDoc = await Review.updateOne({_id:ObjectId.createFromHexString(reviewId)},{review:review});
             if (!updateDoc) {
-                throw new Error("Invalid Id, may not exist");
+                throw new GraphQLError("Invalid Id, may not exist");
             }
-            return {status:"successful review update"}
+            return updateDoc
         } catch(err) {
-            console.error("Error: cant update review " + err)
+            console.error("Error: cant update review " + err);
+            return {error:err}
         }
     },
 
     async deleteReview(_, args) {
         try {
             let reviewId = args.id;
+            let reviewExists = await Review.findOne({_id:ObjectId.createFromHexString(reviewId)});
+            if (!reviewExists) {
+                throw new GraphQLError("Invalid Id, may not exist");
+            }
             let deleteDoc = await Review.deleteOne({_id:ObjectId.createFromHexString(reviewId)});
             if (!deleteDoc) {
-                throw new Error("Invalid Id, may not exist");
+                throw new GraphQLError("Something gone wrong");
             }
-            return {status:"deleted review successfully"}
+            return deleteDoc
         } catch(err) {
-            console.error("Error: Cannot Delete Review " + err)
+            console.error("Cannot Delete Review: " + err);
+            return {error:err}
         }
     }
 }

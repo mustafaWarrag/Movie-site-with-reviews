@@ -1,18 +1,20 @@
 //import { Link, Outlet } from "react-router-dom"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {Outlet, Link, useNavigate} from "react-router";
 import { Box, Button, Container, Divider, FormControl, MenuItem, Select, SvgIcon, TextField, Typography } from "@mui/material";
-import Footer from "./Footer.jsx";
 import { PauseCircle, SearchTwoTone } from "@mui/icons-material";
+import { useSelector, useDispatch } from "react-redux";
+
 import myIcon from "../assets/motion-play.svg";
+import Footer from "./Footer.jsx";
+import { signout } from "../redux/reducers.js";
 
 export default function Navigation(props) {
-    let navi = useNavigate();
+    const username = useSelector((store) => store.user.username);
+    const token = useSelector((store) => store.user.token);
+    const dispatch = useDispatch();
 
-    useEffect(()=>{
-      //props.handleSearch();
-      //navi(`/search?${props.queryType}=${props.query}&page=${props.page}`);
-    },[props.page])
+    let navi = useNavigate();
 
     return (
         <>
@@ -29,17 +31,26 @@ export default function Navigation(props) {
               }}>
               <Typography variant="h4" sx={{
                 display:"inline-block", m:0, 
-                fontFamily:"Rubik, serif", fontWeight:300
+                fontFamily:"Rubik, serif", 
+                fontWeight:300, fontSize:{lg:"2rem", md:"1.7rem", sm:"1.3rem"} 
                 }}>
-                  Movies 
+                  <Typography sx={{
+                    display:{lg:"inline", md:"none", sm:"none", xs:"none"},
+                    fontSize:{lg:"2rem", md:"1.7rem", sm:"1.3rem"} 
+                    }}>
+                    Movies
+                    </Typography> 
                   <img src={myIcon} style={{verticalAlign:"middle"}} />
               </Typography>
               
-                <Link to={"/"} >
+                <Link to={"/"} onClick={()=>{
+                  props.setPage(0);
+                }}>
                   <Button variant="contained" 
                   sx={{
                     display:"inline-block", 
                     m:1,
+                    fontSize:{lg:"1rem", md:".8rem", sm:".6rem"},
                     //color:"primary.main",
                     ":hover":{
                       textDecoration:"underline"
@@ -48,29 +59,35 @@ export default function Navigation(props) {
                   </Button>
                 </Link>
             
-                {props.user.name ? (
-                  <Box> 
-                    <Link to={"/"} onClick={()=>{props.setUser({name:null, id:null})}}>
-                      <Typography sx={{
-                        display:"inline-block", m:1,
-                        color:"primary.main",
-                        ":hover":{
-                          textDecoration:"underline"
-                        }
-                      }}>
+                {username ? (
+                  <> 
+                    <Link to={"/"} onClick={()=>{
+                      dispatch(signout());
+                      localStorage.clear();
+                      }} >
+                      <Button variant="outlined" color="primary"
+                      sx={{
+                        fontSize:{lg:"1rem", md:".8rem", sm:".6rem"},}}  
+                        >
                         Logout
-                      </Typography>
+                      </Button>
                     </Link>
-                    <Typography variant="h5">
-                      Welcome {props.user.name}
+                    <br/>
+                    <Typography variant="h5" sx={{ml:1, 
+                    fontSize:{lg:"1.3rem", md:"1rem", sm:".8rem"},
+                    }}>
+                      Welcome {username}
                     </Typography>
-                  </Box>
+                  </>
                 ) : (
-                  <Link to={"/login"}>
+                  <Link to={"/login"} onClick={()=>{
+                    props.setPage(0);
+                  }}>
                     <Button variant="contained"
                     sx={{
                         display:"inline-block",
                         //color:"primary.main",
+                        fontSize:{lg:"1rem", md:".8rem", sm:".6rem"},
                         ":hover":{
                           textDecoration:"underline"
                         }
@@ -83,25 +100,17 @@ export default function Navigation(props) {
                 </Box>
 
               <FormControl sx={{
-                p:2, pb:0, pt:0,
+                p:4, pb:0, pt:0,
                 display:"flex", 
                 flexWrap:"nowrap", flexDirection:"row",
                 justifyContent:"space-between", alignItems:"center"
-              }} 
-              onSubmit={(e)=>{
-                  e.preventDefault();
-                  props.handleSearch(); //calling this after every submit will lead to the SearchResult comp being re-rendered
-                  props.setPage(0); //to reset the page number on every new search
-                  props.setLoading(true); //very sus
-                  
-                  //navi(`/search?${props.queryType}=${props.query}&page=${props.page}`);
-                  navi("/search");
-                  }}>
-                <TextField type="search" onChange={props.handleChange} value={props.input} placeholder='Search For Movies'
+              }}>
+                <TextField type="search" onChange={props.handleChange} value={props.input} label='Search For Movies'
                 sx={{
                   height:"10%",
-                  width:"400px",
-                  m:1}} 
+                  width:{lg:"400px", md:"300px", sm:"200px"},
+                  m:1
+                }} 
                 slotProps={{
                   input:{
                     startAdornment:(
@@ -109,13 +118,32 @@ export default function Navigation(props) {
                     )
                   }
                 }} />
-                <span>
-                  <Button type="submit" variant="outlined" sx={{height:"10%", ml:1}}>
+                  <Button variant="outlined" 
+                  sx={{height:"10%", ml:1,
+                    fontSize:{lg:"1rem", md:".8rem", sm:".6rem"},
+                  }}
+                  onClick={()=>{
+                    props.handleSearch(); //calling this after every submit will lead to the SearchResult comp being re-rendered
+                    props.setPage(0); //to reset the page number on every new search
+                    props.setLoading(true);
+                    navi("/search");
+                  }}>
                     search
                   </Button>
-                  <Select sx={{display:"none"}}
-                  value={"All Ratings"}
-                  onChange={props.handleSelection}>
+                  <Select 
+                  value={props.filterRating}
+                  onChange={props.handleSelection} 
+                  sx={{
+                    display:"block", 
+                    m:1, mr:0, p:"0px",
+                    fontSize:{lg:".8rem", md:".6rem", sm:".4rem"},
+                  }}
+                  slotProps={{
+                    input:{
+                      //sx:{pr:"20px !important"}
+                    }
+                  }}
+                  >
                     {props.ratings.map((val, index)=> 
                     index === 0 ? 
                     <MenuItem key={index} value={val} defaultValue>{val}</MenuItem> 
@@ -123,7 +151,6 @@ export default function Navigation(props) {
                     <MenuItem key={index} value={val}>{val}</MenuItem>
                     )}
                   </Select>
-                </span>
               </FormControl>
             </Box>
       </Container>

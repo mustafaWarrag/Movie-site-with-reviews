@@ -7,6 +7,7 @@ const Movie = db.model("Movie",{
     num_mflix_comments:Number,
     poster:String,
     title:String,
+    rated:String,
     lastupdated:String,
     languages:{type:[String], index:true},
     released:Date,

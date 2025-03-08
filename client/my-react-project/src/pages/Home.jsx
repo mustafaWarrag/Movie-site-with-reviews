@@ -1,29 +1,25 @@
 import { Link } from "react-router";
 import { useEffect } from "react";
-import { Container, Box, CardMedia, Typography, List, Paper, ListItem, Card, CardContent, Button } from "@mui/material"
-import { PlayCircleFilledTwoTone } from "@mui/icons-material"
-import img1 from "../images/placeholder-image-1.jpg"
-import img2 from "../images/placeholder-image-2.jpg"
-import img3 from "../images/placeholder-image-3.jpg"
-import img4 from "../images/placeholder-image-4.jpg"
-//import placeholderImg from "https://placehold.co/1280x768";
+import { Container, Box, CardMedia, Typography, List, Paper, ListItem, Card, CardContent, Button, Skeleton } from "@mui/material"
+import { PlayCircleFilledTwoTone } from "@mui/icons-material";
 
+//import placeholderImg from "https://placehold.co/1280x768";
 
 import MovieRequests from "../apiRequests/MovieRequests.js";
 
-let images = [img1, img2, img3, img4];
 
 export default function Home(props) {
 
   function queryHomeMovies() {
+    props.setLoading(true);
     MovieRequests.getAll(29,4).then((response)=> {
-      //console.log(response.data.data.getMovies);
       let res = response.data.data.getMovies;
-      console.log(res instanceof Array);
-      console.log(res)
+      //console.log(res)
       props.setInfo(res);
+      props.setLoading(false);
     }).catch((err) => {
       console.error("cant get movies: " + err);
+      props.setLoading(false);
     })
     /*
     if (!window.sessionStorage.getItem("defaultData")) {
@@ -42,9 +38,39 @@ export default function Home(props) {
     //console.log(JSON.parse(window.sessionStorage.getItem("defaultData")));  
    */
   }
+
   useEffect(()=> {
     queryHomeMovies();
-  },[])
+  },[]);
+  
+  if (props.loading) {
+    return (
+        <Container maxWidth="xl" disableGutters>
+          <Box sx={{
+            display:"flex", flexDirection:"column",
+            flexWrap:"wrap", justifyContent:"space-between",
+            p:3, height:"90vh"
+          }}>
+              <Skeleton height={"50vh"} width={"100%"}
+              />
+
+              <Box sx={{
+                width:"100%", height:"30vh",
+                display:"inline-flex", justifyContent:"space-between",
+                flexDirection:"row", flexWrap:"wrap"
+                }}>
+                { [...new Array(3)].map((val,index) => 
+                  <Skeleton key={index} sx={{
+                    width:"30%", height:"100%"
+                  }} />
+                )
+              }
+              </Box>
+            </Box>
+          </Container>
+      )
+    };
+
     return (
       <Container maxWidth="xl" disableGutters>
         <Box sx={{
@@ -74,8 +100,10 @@ export default function Home(props) {
                   <Typography variant="subtitle1" sx={{m:1, ml:0, fontSize:"1.1rem"}}>
                     {props.info[0].plot}
                   </Typography>
-                  <Button variant="contained">
-                    <PlayCircleFilledTwoTone />Play Movie
+                  <Button variant="contained" 
+                  href="https://www.youtube.com/watch?v=wTmWsrHp2nA" target="_blank">
+                    <PlayCircleFilledTwoTone />
+                    Watch Trailer
                   </Button>
                   <Link to={`/movies/id/${props.info[0]._id}`} style={{color:"#fff"}}>
                     <Button variant="outlined" color="error.light" sx={{ml:1}}>
@@ -105,7 +133,7 @@ export default function Home(props) {
                 p:0,
                 "& :last-child":{pb:1}
                 }}>
-                <CardMedia image={val.poster? val.poster : img4} sx={{
+                <CardMedia image={val.poster? val.poster : "https://placehold.co/1280x768/000000/ffffff"} sx={{
                   height:"600px",
                   display:"flex",
                   justifyContent:"left", alignItems:"end",
@@ -133,34 +161,24 @@ export default function Home(props) {
                       </Typography>
                     </Box>
                 
-                <Box className="genres">
-                  <Typography variant="overline">Genres:</Typography>
-                  <List sx={{display:"inline"}}>[
-                    {val.genres.map((val,index, arr) => index === arr.length-1? (
-                    <Typography key={index} variant="button" sx={{display:"inline"}}>
-                        {val}
-                    </Typography> 
-                    ) : (
-                    <Typography key={index} variant="button" sx={{display:"inline", mr:1}}>
-                      {val},
-                    </Typography>
-                    )
-                  )}
-                  ]
-                  </List>
+                  <Box className="genres">
+                    <Typography variant="overline">Genres:</Typography>
+                    <List sx={{display:"inline"}}>[
+                      {val.genres.map((val,index, arr) => index === arr.length-1? (
+                      <Typography key={index} variant="button" sx={{display:"inline"}}>
+                          {val}
+                      </Typography> 
+                      ) : (
+                      <Typography key={index} variant="button" sx={{display:"inline", mr:1}}>
+                        {val},
+                      </Typography>
+                      )
+                    )}
+                    ]
+                    </List>
+                  </Box>
                 </Box>
-                
-                </Box>
-                {/*
-                <div className="reviews">
-                  {props.info.reviews.map((valObj, index)=> 
-                    <div style={{border:"1px solid #fff", padding:"5px", margin:"10px"}} key={index}>
-                    <h3 style={{color:"#51f"}}><strong>{valObj.name}</strong></h3>
-                    <p>{valObj.review}</p> 
-                    <blockquote>--uploaded:{props.dateFixer(valObj.date)}</blockquote>
-                  </div>)}
-                </div>
-                */}
+
                 <Link to={`/movies/id/${val._id}`} style={{textDecoration:"none"}}>
                   <Button variant="contained" onClick={()=>{props.setLoading(true)}}>
                     See Reviews
@@ -168,11 +186,12 @@ export default function Home(props) {
                 </Link>
                 </Box>
                 </CardMedia>
-
               </CardContent>
+
             </Card>
             )}
           </Container>
+
         </Box>
       </Container>
     )
