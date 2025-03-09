@@ -1,8 +1,8 @@
 //import { Link, Outlet } from "react-router-dom"
 import { useEffect, useState } from "react";
 import {Outlet, Link, useNavigate} from "react-router";
-import { Box, Button, Container, Divider, FormControl, MenuItem, Select, SvgIcon, TextField, Typography } from "@mui/material";
-import { PauseCircle, SearchTwoTone } from "@mui/icons-material";
+import { Box, Button, Container, Divider, FormControl, IconButton, MenuItem, Select, Drawer, TextField, Typography } from "@mui/material";
+import { MenuOutlined, PauseCircle, SearchTwoTone } from "@mui/icons-material";
 import { useSelector, useDispatch } from "react-redux";
 
 import myIcon from "../assets/motion-play.svg";
@@ -13,6 +13,8 @@ export default function Navigation(props) {
     const username = useSelector((store) => store.user.username);
     const token = useSelector((store) => store.user.token);
     const dispatch = useDispatch();
+
+    let [drawerOpen, setDrawer] = useState(false);
 
     let navi = useNavigate();
 
@@ -25,8 +27,11 @@ export default function Navigation(props) {
             flexDirection:"row",
             justifyContent:"space-between", alignItems:"center"
             }}>
+
+              {/* for large screens */}
               <Box sx={{
-              display:"flex", flexWrap:"nowrap", 
+              display:{lg:"flex", md:"flex", sm:"none"}, 
+              flexWrap:"nowrap", 
               flexDirection:"row", alignItems:"center"
               }}>
               <Typography variant="h4" sx={{
@@ -67,14 +72,15 @@ export default function Navigation(props) {
                       }} >
                       <Button variant="outlined" color="primary"
                       sx={{
-                        fontSize:{lg:"1rem", md:".8rem", sm:".6rem"},}}  
+                        fontSize:{lg:"1rem", md:".8rem", sm:".6rem", xs:".6rem"}
+                      }}  
                         >
                         Logout
                       </Button>
                     </Link>
                     <br/>
                     <Typography variant="h5" sx={{ml:1, 
-                    fontSize:{lg:"1.3rem", md:"1rem", sm:".8rem"},
+                    fontSize:{lg:"1.3rem", md:"1rem", sm:".8rem", xs:".6rem"},
                     }}>
                       Welcome {username}
                     </Typography>
@@ -87,7 +93,7 @@ export default function Navigation(props) {
                     sx={{
                         display:"inline-block",
                         //color:"primary.main",
-                        fontSize:{lg:"1rem", md:".8rem", sm:".6rem"},
+                        fontSize:{lg:"1rem", md:".8rem", sm:".6rem", xs:".6rem"},
                         ":hover":{
                           textDecoration:"underline"
                         }
@@ -98,6 +104,106 @@ export default function Navigation(props) {
                   )
                 }
                 </Box>
+
+                {/* for small mobile devices */}
+                <IconButton centerRipple size={"large"}
+                onClick={()=>{
+                  setDrawer(true);
+                }} 
+                sx={{
+                  display:{lg:"none", md:"none", sm:"block"},
+                  fontSize:"2rem", borderRadius:"30px"
+                }}>
+                  <MenuOutlined htmlColor={"#f19"} />
+                </IconButton>
+
+                <Drawer 
+                open={drawerOpen}
+                onClose={()=>{setDrawer(false)}}
+                anchor={"left"}
+                sx={{
+                  "& MuiPaper-root-MuiDrawer-paper":{
+                    bgcolor:"#000 !important",
+                    boxShadow:"none"
+                  }
+                }}
+                >
+                  <Box sx={{
+                  display:"flex", 
+                  flexWrap:"nowrap", 
+                  flexDirection:"column", alignItems:"center", width:"30vw"
+                  }}>
+                  <Typography variant="h4" sx={{
+                    display:"inline-block", m:0, 
+                    fontFamily:"Rubik, serif", 
+                    fontWeight:300, fontSize:"2.3rem" 
+                    }}>
+                    <img src={myIcon} style={{verticalAlign:"middle"}} />
+                  </Typography>
+                
+                  <Link to={"/"} onClick={()=>{
+                    props.setSearch([]);
+                    props.setPage(0);
+                    setDrawer(false);
+                  }}>
+                    <Button variant="contained" 
+                    sx={{
+                      display:"inline-block", 
+                      m:1,
+                      fontSize:"1.0rem",
+                      //color:"primary.main",
+                      ":hover":{
+                        textDecoration:"underline"
+                      }}}>
+                      Home
+                    </Button>
+                  </Link>
+              
+                  {username ? (
+                    <> 
+                      <Link to={"/"} onClick={()=>{
+                        dispatch(signout());
+                        localStorage.clear();
+                        setDrawer(false);
+                        }} >
+                        <Button variant="outlined" color="primary"
+                        sx={{
+                          fontSize:"1rem"
+                        }}  
+                          >
+                          Logout
+                        </Button>
+                      </Link>
+                      <br/>
+                      <Typography variant="h5" 
+                      sx={{
+                        ml:1, 
+                        fontSize:"1rem",
+                      }}>
+                        Welcome {username}
+                      </Typography>
+                    </>
+                  ) : (
+                    <Link to={"/login"} onClick={()=>{
+                      props.setPage(0);
+                      setDrawer(false);
+                    }}>
+                      <Button variant="contained"
+                      sx={{
+                          display:"inline-block",
+                          //color:"primary.main",
+                          fontSize:"1rem",
+                          ":hover":{
+                            textDecoration:"underline"
+                          }
+                        }}>
+                          Login
+                        </Button>
+                    </Link>
+                    )
+                  }
+                  </Box>
+                </Drawer>
 
               <FormControl sx={{
                 p:4, pb:0, pt:0,
@@ -120,13 +226,14 @@ export default function Navigation(props) {
                 }} />
                   <Button variant="outlined" 
                   sx={{height:"10%", ml:1,
-                    fontSize:{lg:"1rem", md:".8rem", sm:".6rem"},
+                    fontSize:{lg:"1rem", md:".8rem", sm:".8rem"},
                   }}
                   onClick={()=>{
-                    props.handleSearch(); //calling this after every submit will lead to the SearchResult comp being re-rendered
+                    props.setSearch([]);
                     props.setPage(0); //to reset the page number on every new search
+                    props.handleSearch(); //calling this after every submit will lead to the SearchResult comp being re-rendered
                     props.setLoading(true);
-                    navi("/search");
+                    navi("/search?");
                   }}>
                     search
                   </Button>
@@ -136,7 +243,7 @@ export default function Navigation(props) {
                   sx={{
                     display:"block", 
                     m:1, mr:0, p:"0px",
-                    fontSize:{lg:".8rem", md:".6rem", sm:".4rem"},
+                    fontSize:{lg:".8rem", md:".6rem", sm:".6rem"},
                   }}
                   slotProps={{
                     input:{

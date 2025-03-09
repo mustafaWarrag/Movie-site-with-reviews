@@ -10,11 +10,10 @@ import './index.css'
 import App from './App.jsx'
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  
     <Provider store={store}>
       <ErrorBoundary fallback={<FallbackErrorBoundary/>}>
         <App />
       </ErrorBoundary>
-    </Provider>
-  </StrictMode>,
+    </Provider>,
 )

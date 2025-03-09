@@ -48,21 +48,22 @@ export default function Home(props) {
         <Container maxWidth="xl" disableGutters>
           <Box sx={{
             display:"flex", flexDirection:"column",
-            flexWrap:"wrap", justifyContent:"space-between",
-            p:3, height:"90vh"
+            flexWrap:"nowrap", justifyContent:"space-between", m:0,
+            p:3, minHeight:"95vh"
           }}>
-              <Skeleton height={"50vh"} width={"100%"}
+            <Box sx={{height:"70vh", width:"100%"}}>
+              <Skeleton variant="rounded" height={"100%"} width={"100%"}
               />
+            </Box>
 
               <Box sx={{
-                width:"100%", height:"30vh",
+                width:"100%", height:"60vh", mt:3,
                 display:"inline-flex", justifyContent:"space-between",
                 flexDirection:"row", flexWrap:"wrap"
                 }}>
                 { [...new Array(3)].map((val,index) => 
-                  <Skeleton key={index} sx={{
-                    width:"30%", height:"100%"
-                  }} />
+                  <Skeleton variant="rounded" key={index} width="31%" height="100%"
+                   />
                 )
               }
               </Box>
@@ -116,16 +117,18 @@ export default function Home(props) {
           </CardContent>
           </Box>
           
+          
           <Container sx={{
             mb:3,
-            display:"flex", flexWrap:"wrap",
+            display:"flex", flexDirection:{sm:"row", xs:"column"}, 
+            flexWrap:"wrap",
             justifyContent:"space-between"
           }}>
             {props.info.slice(1,4).map((val, index) =>  
             <Card elevation={3} key={index} sx={{
               //borderColor:"info.main",
               bgcolor:"primary.900",
-              width:"30%", 
+              width:{sm:"30%", xs:"80%"}, 
               mt:5, pb:0
               }}>
               

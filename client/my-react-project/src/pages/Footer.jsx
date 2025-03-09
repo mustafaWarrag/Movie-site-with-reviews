@@ -17,10 +17,10 @@ export default function Footer(props) {
                         Mustafa Warrag &copy;2025
                     </Typography>
                     <ButtonGroup>
-                        <Button>
+                        <Button target="_blank" href="https://github.com/mustafaWarrag">
                             <GitHub />
                         </Button>
-                        <Button>
+                        <Button target="_blank" href="https://www.linkedin.com/in/mustafa-warrag-90858a323/">
                             <LinkedIn />
                         </Button>
                     </ButtonGroup>

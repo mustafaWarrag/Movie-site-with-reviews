@@ -70,9 +70,9 @@ export default function MovieComp(props) {
             {props.info.slice(0, 1).map((val, index) =>  
             <div key={index}>
             <Box  sx={{
-                display:"flex", flexWrap:"nowrap",
+                display:"flex", flexWrap:{sm:"nowrap", xs:"wrap"},
                 justifyContent:"space-between", p:3}}>
-                <Box sx={{flexBasis:"40%"}}>
+                <Box sx={{flexBasis:{sm:"40%", xs:"100%"}}}>
                     <CardMedia image={val.poster? val.poster : "https://placehold.co/1280x768/000000/ffffff"} 
                     sx={{
                         height:"530px",

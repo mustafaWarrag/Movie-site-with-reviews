@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {BrowserRouter, Routes, Route} from "react-router";
 import { CssBaseline, ThemeProvider, createTheme } from '@mui/material';
 import { pink, lightBlue } from '@mui/material/colors';
@@ -24,6 +24,7 @@ import '@fontsource/roboto/700.css';
 function App() {
   const dispatch = useDispatch();
 
+  let loaderRef = useRef(null);
   const [input, setInput] = useState(""); // state for the search movies input
   const [info, setInfo] = useState([ // state for default values for a movie in the database
     {
@@ -36,19 +37,13 @@ function App() {
 
     }
   ]);
-  const [search, setSearch] = useState([ //state for the default search results
-    {
-      title:"default search results",
-      plot:"lorem lorem lorem",
-      genres:["drama","placeholder"],
-    }
-  ]);
+  const [search, setSearch] = useState([]) //state to handle search results;
+  const [page, setPage] = useState(0); //state to handle current page number
+  const [numOfPages, setNumOfPages] = useState(1); //state to handle the total results
   const [ratings, setRatings] = useState(["All Ratings"]); //state to hold all the ratings after grabbing them from the database
   const [filterRating, setFilter] = useState("All Ratings"); //state to hold the selected rating from the array of options
-  const [page, setPage] = useState(0); //state to handle current page number
 
   const [loading, setLoading] = useState(true); //state to handle whether the backend data has been fetched or not
-  const [numOfPages, setNumOfPages] = useState(1); //state to handle the overall number of pages for the results
   
   const darkTheme = createTheme({
     palette:{
@@ -60,29 +55,6 @@ function App() {
 
   function handleChange(e) {
     setInput(e.target.value);
-  }
-  
-
-  function handleSearch() {
-    setLoading(true);
-    let rating = filterRating === "All Ratings"? null : filterRating;
-    let data = {
-      title:input,
-      rated:rating 
-    }
-    MovieRequests.searchForMovie(data, page).then((res)=> {
-      let response = res.data.data.searchForMovieByFilter;
-      //console.log(response);  
-      setSearch(response.movies);
-      setLoading(false);
-      
-      let num = pageNumberCalc(response.totalNumOfMovies);
-      //console.log(`num:${num}`);
-      setNumOfPages(num);
-    }).catch((err) => {
-      console.error(err.response.data);
-      setLoading(false);
-    })
   }
     
   function grabRatings() { 
@@ -96,19 +68,33 @@ function App() {
     setFilter(e.target.value);
     console.log("selected: " + e.target.value);
   }
-
-  function handlePagination(num) {
-    setPage(num);
-    setLoading(true);
-    console.log(page);
-  }
   
-  function pageNumberCalc(num) {
-    if (num % 4 !== 0) {
-      return (Math.floor((num+1)/4))
-    } else {
-      return (Math.floor(num/4));
+  
+  
+  function handleSearch() {
+    //props.setLoading(true);
+    let rating = filterRating === "All Ratings"? null : filterRating;
+    let data = {
+      title:input,
+      rated:rating 
     }
+    MovieRequests.searchForMovie(data, page).then((res)=> {
+      let response = res.data.data.searchForMovieByFilter;
+      //console.log(response);  
+      setSearch((prevArr)=> [...prevArr, ...response.movies]);
+      setLoading(false);
+      setNumOfPages(response.totalNumOfMovies);
+
+    }).catch((err) => {
+      console.error(err.response.data);
+      setLoading(false);
+    })
+  }
+
+  function handleLoadMoreData() {
+    setPage((prevVal) => prevVal+1);
+    setLoading(false);
+    handleSearch();
   }
 
   let filter = new badwords.Filter;
@@ -137,14 +123,9 @@ function App() {
   useEffect(()=>{
     grabRatings();
     tokenVerify();
+    //remember to reapply strict mode
   },[]);
 
-            /*
-            note to self:
-            test the react app with Jest/Mocha
-            dont forget the API key stuff too
-            all done, just make it responsive to small devices
-            */
   return (
     <>
     <ThemeProvider theme={darkTheme}>
@@ -152,18 +133,20 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigation 
-          handleSelection={handleSelection} handleSearch={handleSearch} handleChange={handleChange} 
+          handleSelection={handleSelection} handleChange={handleChange} handleSearch={handleSearch} 
           ratings={ratings} filterRating={filterRating}
           input={input} 
-          page={page} setPage={setPage}
-          setLoading={setLoading}
+          setSearch={setSearch}
+          setLoading={setLoading} 
+          setPage={setPage}
           />
           }>
             <Route index element={<Home info={info} setInfo={setInfo} loading={loading} setLoading={setLoading} />} />
             <Route path="search" element={<SearchResults loading={loading} setLoading={setLoading}
-            search={search} handleSearch={handleSearch}
-            page={page} handlePagination={handlePagination} 
+            search={search} setSearch={setSearch} 
+            page={page} setPage={setPage}
             numOfPages={numOfPages}
+            handleLoadMoreData={handleLoadMoreData}
             />} />
             <Route path={`movies/id/:id`} element={<MovieComp info={info} setInfo={setInfo} 
             loading={loading} setLoading={setLoading}
