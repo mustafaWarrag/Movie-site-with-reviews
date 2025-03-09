@@ -7,7 +7,7 @@ import { expressMiddleware } from "@apollo/server/express4"
 import http from "http"
 
 import apollo from "./graphQLmain.js";
-import router from "./routers/movies.routes.js";
+//import router from "./routers/movies.routes.js";
 
 let app = express();
 app.use(cors());
@@ -18,7 +18,7 @@ app.use(express.json());
 configDotenv();
 let PORT = process.env.VITE_PORT || 8080;
 
-app.use("/api/v1/movies", router);
+//app.use("/api/v1/movies", router);
 
 app.get("*", (req, res) => {
     res.status(404).json({error:"page not found"});
