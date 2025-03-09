@@ -14,7 +14,7 @@ export default class UserRequests {
             }
         `
         return await axios({
-            url:`http://localhost:8080/graphql/`,
+            url:`https://movie-site-with-reviews.onrender.com/graphql/`,
             method:"post",
             data:{query:HANDLE_LOGIN}
         })
@@ -31,7 +31,7 @@ export default class UserRequests {
             }
         `
         return await axios({
-            url:`http://localhost:8080/graphql/`,
+            url:`https://movie-site-with-reviews.onrender.com/graphql/`,
             method:"post",
             data:{query:TOKEN_VERIFY}
         })
@@ -52,7 +52,7 @@ export default class UserRequests {
             }
         `;
         return await axios({
-            url:"http://localhost:8080/graphql/",
+            url:"https://movie-site-with-reviews.onrender.com/graphql/",
             method:"post",
             data:{query:CREATE_USER}
         });
@@ -71,7 +71,7 @@ export default class UserRequests {
             }
         `;
         return await axios({
-            url:"http://localhost:8080/graphql/",
+            url:"https://movie-site-with-reviews.onrender.com/graphql/",
             method:"post",
             data:{query:DELETE_USER}
         });
