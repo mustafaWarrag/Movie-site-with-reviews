@@ -62,8 +62,8 @@ export default function Login(props) {
         UserRequests.createUser(data).then((res) => {
             let cred = res.data.data.createUser;
             let errors = res.data.errors;
-            console.log(errors);
-            console.log(cred);
+            //console.log(errors);
+            //console.log(cred);
             if (!cred._id) {
                 throw new Error(errors[0].message);
             }

@@ -18,7 +18,7 @@ export default function Home(props) {
       props.setInfo(res);
       props.setLoading(false);
     }).catch((err) => {
-      console.error("cant get movies: " + err);
+      //console.error("cant get movies: " + err);
       props.setLoading(false);
     })
     /*

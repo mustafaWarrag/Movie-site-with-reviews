@@ -94,13 +94,13 @@ export default function CreateReview(props) {
                 console.error(err);
             })
         }
-        console.log(`has submitted: ${hasSubmitted}`)
+        //console.log(`has submitted: ${hasSubmitted}`)
     }
 
     function editReview() {
         if (hasSubmitted === true && editing === true) {
             props.setLoading(true);
-            console.log(`editing now...`);
+            //console.log(`editing now...`);
             let data = {
                 id:currentReviewId,
                 review:review,
@@ -112,7 +112,7 @@ export default function CreateReview(props) {
                 setEditing(false);
                 props.grabMovieById(params.id);
             }).catch((err)=>{
-                console.error(err);
+                //console.error(err);
                 props.setLoading(false);
             })
         }
@@ -123,7 +123,7 @@ export default function CreateReview(props) {
         let data = {
             id:currentReviewId
         } 
-        console.log(`current review's id:${currentReviewId}`);
+        //console.log(`current review's id:${currentReviewId}`);
         ReviewRequests.deleteReview(data).then((res)=>{
             let response = res.data.data;
             //console.log(response);
@@ -132,7 +132,7 @@ export default function CreateReview(props) {
             changeSub(false);
             setEditing(false);
         }).catch((err)=>{
-            console.error(err);
+            //console.error(err);
             props.setLoading(false);
         }) 
         

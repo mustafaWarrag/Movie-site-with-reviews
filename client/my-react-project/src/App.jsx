@@ -66,7 +66,7 @@ function App() {
   }
   function handleSelection(e) {
     setFilter(e.target.value);
-    console.log("selected: " + e.target.value);
+    //console.log("selected: " + e.target.value);
   }
   
   
@@ -86,7 +86,7 @@ function App() {
       setNumOfPages(response.totalNumOfMovies);
 
     }).catch((err) => {
-      console.error(err.response.data);
+      //console.error(err.response.data);
       setLoading(false);
     })
   }
@@ -113,7 +113,7 @@ function App() {
         //console.log(`username:${cred.username}, token:${cache}`);
         dispatch(login({username:cred.username, token:cache}));
       }).catch((err) => {
-        console.error(err);
+        //console.error(err);
         localStorage.clear();
         dispatch(signout());
       })
@@ -123,7 +123,6 @@ function App() {
   useEffect(()=>{
     grabRatings();
     tokenVerify();
-    //remember to reapply strict mode
   },[]);
 
   return (

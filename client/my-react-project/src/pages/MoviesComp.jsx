@@ -17,10 +17,10 @@ export default function MovieComp(props) {
             let res = response.data.data.getMovieById[0];
             props.setInfo([res]);
             props.setLoading(false);
-            console.log(res);
-            console.log(id);
+            //console.log(res);
+            //console.log(id);
         }).catch((err)=> {
-            console.error(err);
+            //console.error(err);
             props.setLoading(false);
         })
         
@@ -38,8 +38,8 @@ export default function MovieComp(props) {
     useEffect(()=>{
         props.setLoading(true);
         grabMovieById(params.id);
-        console.log(typeof params.id);
-        console.log(`url params: ${params.id}`);
+        //console.log(typeof params.id);
+        //console.log(`url params: ${params.id}`);
     }, [params.id])
 
     if (props.loading) {

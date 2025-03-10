@@ -13,7 +13,9 @@ createRoot(document.getElementById('root')).render(
   
     <Provider store={store}>
       <ErrorBoundary fallback={<FallbackErrorBoundary/>}>
-        <App />
+        <StrictMode>
+          <App />
+        </StrictMode>
       </ErrorBoundary>
     </Provider>,
 )
