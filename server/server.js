@@ -10,7 +10,7 @@ import apollo from "./graphQLmain.js";
 //import router from "./routers/movies.routes.js";
 
 let app = express();
-app.use(cors());
+app.use(cors({origin:"https://movies-website-with-reviews.netlify.app"}));
 app.use(morgan("dev"));
 app.use(express.json());
 //app.all("/graphql", createHandler({schema:schema}))
